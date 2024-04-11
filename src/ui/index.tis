@@ -574,6 +574,20 @@ class App: Reactor.Component
                     {!system_error && handler.is_login_wayland() && !handler.current_is_wayland() ? <FixWayland /> : ""}
                     {!system_error && handler.current_is_wayland() ? <ModifyDefaultLogin /> : ""}
                 </div>
+                <div .right-pane>
+                    <div .right-content>
+                        <div .card-connect>
+                            <div .title>{translate('Control Remote Desktop')}</div>
+                            <ID @{this.remote_id} />
+                            <div .right-buttons>
+                                <button .button .outline #file-transfer>{translate('Transfer file')}</button>
+                                <button .button #connect>{translate('Connect')}</button>
+                            </div>
+                        </div>
+                        <MultipleSessions @{this.multipleSessions} />
+                    </div>
+                    <ConnectStatus @{this.connect_status} />
+                </div>
                 <div #overlay style="position: absolute;size:*;background:black;opacity:0.5;display:none" />
             </div>;
     }
@@ -1033,29 +1047,6 @@ function updatePasswordArea() {
 }
 updatePasswordArea();
 
-class ID: Reactor.Component {
-    function render() {
-        return <input type="text" #remote_id .outline-focus novalue={translate("Enter Remote ID")}
-        value={formatId(handler.get_remote_id())} />;
-    }
-
-    // https://github.com/c-smile/sciter-sdk/blob/master/doc/content/sciter/Event.htm
-    event change {
-        var fid = formatId(this.value);
-        var d = this.value.length - (this.old_value || "").length;
-        this.old_value = this.value;
-        var start = this.xcall(#selectionStart) || 0;
-        var end = this.xcall(#selectionEnd);
-        if (fid == this.value || d <= 0 || start != end) {
-            return;
-        }
-        // fix Caret position
-        this.value = fid;
-        var text_after_caret = this.old_value.substr(start);
-        var n = fid.length - formatId(text_after_caret).length;
-        this.xcall(#setSelection, n, n);
-    }
-}
 
 var reg = /^\d+$/;
 function formatId(id) {
